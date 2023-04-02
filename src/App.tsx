@@ -3,6 +3,7 @@ import "./App.css";
 import * as _ from "lodash";
 import { useState } from "react";
 import { Layer, Line, Rect, Stage } from "react-konva";
+import { Button } from "@mantine/core";
 
 // used color picker: https://imagecolorpicker.com/
 // picked from top left lighting
@@ -17,6 +18,7 @@ interface WallTileProps {
   x: number;
   y: number;
   flipY?: boolean;
+  startColor?: string;
 }
 
 const GROUT_COLOR = "lightgray";
@@ -52,11 +54,11 @@ const WallTile = (props: WallTileProps) => {
     return idx % 2 === 0 ? val + props.x * SCALE : val + props.y * SCALE;
   });
 
-  const startColor =
-    _.random() > 0.8
-      ? COLORS.UPTOWN
-      : _.sample([COLORS.FANDANGO, COLORS.VOGUE, COLORS.TWIST]);
-  const [color, setColor] = useState<string>(startColor!);
+  // const startColor =
+  //   _.random() > 0.8
+  //     ? COLORS.UPTOWN
+  //     : _.sample([COLORS.FANDANGO, COLORS.VOGUE, COLORS.TWIST]);
+  const [color, setColor] = useState<string>(props.startColor || COLORS.UPTOWN);
   // .baseLocation.map((x, idx) => (x + ))
 
   const randomNewColor = (currentColor: string) => {
@@ -80,13 +82,35 @@ const WallTile = (props: WallTileProps) => {
   );
 };
 
+const ColorPickerButtons = () => {
+  const availColors = ["orange", "lime", "cyan", "dark"];
+  const [currentColor, setCurrentColor] = useState<string>("orange");
+  const colorButtons:any[] = [];
+  availColors.forEach(function (color) {
+    colorButtons.push(
+    <Button
+      variant={currentColor === color ? "filled" : "outline"} 
+      color={color}
+      onClick={() => setCurrentColor(color)}
+    >
+      {color.toUpperCase()}
+    </Button>);
+  })
+
+  return (
+    <Button.Group>
+      {colorButtons}
+    </Button.Group>
+  )
+}
+
 const App = () => {
   const simulateLight = false;
   // Stage is a div container
   // Layer is actual canvas element (so you may have several canvases in the stage)
   // And then we have canvas shapes inside the Layer
 
-  const positions: { x: number; y: number; flipY?: boolean }[] = [];
+  const positions: { x: number; y: number; flipY?: boolean; startColor?: string}[] = [];
   for (let xIdx = 0; xIdx < 10; xIdx++) {
     for (let yIdx = 0; yIdx < 8; yIdx++) {
       positions.push({ x: xIdx * 2, y: yIdx * 2.5 });
@@ -94,31 +118,36 @@ const App = () => {
     }
   }
 
+  const clearGrid = () => {
+
+  }
+
   return (
-    <Stage width={window.innerWidth} height={window.innerHeight}>
-      <Layer>
-        <WallTile x={1} y={-1.5} flipY />
-        <WallTile x={1} y={1} flipY />
-        <WallTile x={3} y={1} flipY />
-        {positions.map((p) => (
-          <WallTile x={p.x} y={p.y} flipY={p.flipY} />
-        ))}
-        {/* TODO: figure out how to ignore clicks on the overlay */}
-        {!simulateLight ? null : (
-          <Rect
-            x={0}
-            y={0}
-            width={SCALE * 20}
-            height={SCALE * 50}
-            fillPriority="linear-gradient"
-            fillLinearGradientStartPoint={{ x: 0, y: 0 }}
-            fillLinearGradientEndPoint={{ x: SCALE * 20, y: 0 }}
-            fillLinearGradientColorStops={[0, "#FFF", 1, "#000"]}
-            opacity={0.01}
-          />
-        )}
-      </Layer>
-    </Stage>
+    <div>
+      <Stage width={window.innerWidth} height={window.innerHeight}>
+        <Layer>
+          {positions.map((p) => (
+            <WallTile x={p.x} y={p.y} flipY={p.flipY} startColor={p.startColor}/>
+          ))}
+          {/* TODO: figure out how to ignore clicks on the overlay */}
+          {!simulateLight ? null : (
+            <Rect
+              x={0}
+              y={0}
+              width={SCALE * 20}
+              height={SCALE * 50}
+              fillPriority="linear-gradient"
+              fillLinearGradientStartPoint={{ x: 0, y: 0 }}
+              fillLinearGradientEndPoint={{ x: SCALE * 20, y: 0 }}
+              fillLinearGradientColorStops={[0, "#FFF", 1, "#000"]}
+              opacity={0.01}
+            />
+          )}
+        </Layer>
+      </Stage>
+      <ColorPickerButtons />
+      <Button variant="outline" color="white" onClick={()=> clearGrid()}>Clear</Button>
+    </div>
   );
 };
 
