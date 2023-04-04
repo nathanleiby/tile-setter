@@ -10,9 +10,18 @@ import { Button } from "@mantine/core";
 const COLORS = {
   FANDANGO: "#e69553",
   TWIST: "#b8c170",
+  JETSETTER: "#00a6b6",
   UPTOWN: "#f0f0f0",
   VOGUE: "#4b5366",
 };
+
+const colorMapping: { [name: string]: string } = {
+  "orange": COLORS.FANDANGO,
+  "lime": COLORS.TWIST,
+  "cyan": COLORS.JETSETTER,
+  "white": COLORS.UPTOWN,
+  "dark": COLORS.VOGUE,
+}
 
 interface WallTileProps {
   x: number;
@@ -26,7 +35,11 @@ const GROUT_WIDTH = 5;
 
 const TILE_WIDTH = 2;
 const TILE_HEIGHT = 2.5;
-const SCALE = 60;
+const SCALE = 25;
+const NUMTILEWIDTH = 40;
+const NUMTILEHEIGHT = 25;
+
+let currentPaintColor = COLORS.FANDANGO;
 
 const WallTile = (props: WallTileProps) => {
   const baseLocation = props.flipY
@@ -61,13 +74,13 @@ const WallTile = (props: WallTileProps) => {
   const [color, setColor] = useState<string>(props.startColor || COLORS.UPTOWN);
   // .baseLocation.map((x, idx) => (x + ))
 
-  const randomNewColor = (currentColor: string) => {
-    let result;
-    while (result === undefined || result === currentColor) {
-      result = _.sample(Object.values(COLORS));
-    }
-    return result;
-  };
+  // const randomNewColor = (currentColor: string) => {
+  //   let result;
+  //   while (result === undefined || result === currentColor) {
+  //     result = _.sample(Object.values(COLORS));
+  //   }
+  //   return result;
+  // };
 
   return (
     <Line
@@ -77,13 +90,13 @@ const WallTile = (props: WallTileProps) => {
       strokeWidth={GROUT_WIDTH}
       closed={true}
       // Konva.Util.getRandomColor()
-      onClick={() => setColor(randomNewColor(color))}
+      onClick={() => setColor(currentPaintColor)}
     />
   );
 };
 
 const ColorPickerButtons = () => {
-  const availColors = ["orange", "lime", "cyan", "dark"];
+  const availColors = ["orange", "lime", "cyan", "dark", "white"];
   const [currentColor, setCurrentColor] = useState<string>("orange");
   const colorButtons:any[] = [];
   availColors.forEach(function (color) {
@@ -91,7 +104,11 @@ const ColorPickerButtons = () => {
     <Button
       variant={currentColor === color ? "filled" : "outline"} 
       color={color}
-      onClick={() => setCurrentColor(color)}
+      onClick={() => {
+        setCurrentColor(color);
+        currentPaintColor = colorMapping[color];
+      }
+      }
     >
       {color.toUpperCase()}
     </Button>);
@@ -111,8 +128,8 @@ const App = () => {
   // And then we have canvas shapes inside the Layer
 
   const positions: { x: number; y: number; flipY?: boolean; startColor?: string}[] = [];
-  for (let xIdx = 0; xIdx < 10; xIdx++) {
-    for (let yIdx = 0; yIdx < 8; yIdx++) {
+  for (let xIdx = 0; xIdx < NUMTILEWIDTH; xIdx++) {
+    for (let yIdx = 0; yIdx < NUMTILEHEIGHT; yIdx++) {
       positions.push({ x: xIdx * 2, y: yIdx * 2.5 });
       positions.push({ x: xIdx * 2 + 1, y: yIdx * 2.5 - 1.5, flipY: true });
     }
