@@ -92,6 +92,44 @@ const WallTile = (props: WallTileProps) => {
   );
 };
 
+const createBagOfTiles = (
+  pWhiteOrNot: number,
+  pYellow: number,
+  pOrange: number,
+  pBlue: number
+): string[] => {
+  const tileCount = 420;
+
+  const whiteTileCount = Math.ceil(tileCount * pWhiteOrNot);
+  const remainingTiles = tileCount - whiteTileCount;
+
+  const bag = [];
+  // add white tiles
+  for (let i = 0; i < whiteTileCount; i++) {
+    bag.push(COLORS.WHITE_TILE);
+  }
+
+  // add yellow tiles
+  const yellowTileCount = Math.ceil(remainingTiles * pYellow);
+  for (let i = 0; i < yellowTileCount; i++) {
+    bag.push(COLORS.YELLOW_TILE);
+  }
+
+  // add orange tiles
+  const orangeTileCount = Math.ceil(remainingTiles * pOrange);
+  for (let i = 0; i < orangeTileCount; i++) {
+    bag.push(COLORS.ORANGE_TILE);
+  }
+
+  // add blue tiles
+  const blueTileCount = Math.ceil(remainingTiles * pBlue);
+  for (let i = 0; i < blueTileCount; i++) {
+    bag.push(COLORS.BLUE_TILE);
+  }
+
+  return _.shuffle(bag);
+};
+
 const App = () => {
   // Stage is a div container
   // Layer is actual canvas element (so you may have several canvases in the stage)
@@ -113,15 +151,14 @@ const App = () => {
     window.innerHeight / CANVAS_VIRTUAL_HEIGHT
   );
 
+  // use "bag of tiles" randomization to make sure we actually get #s right
+  const bagOfTiles = createBagOfTiles(pWhite, pYellow, pOrange, pBlue);
+
   const getColor = () => {
-    let color = randomTileColor(pWhite, pYellow, pOrange, pBlue);
-
-    // don't repeat previous color
-    while (color !== COLORS.WHITE_TILE && lastColor === color) {
-      color = randomTileColor(pWhite, pYellow, pOrange, pBlue);
+    let color = bagOfTiles.pop();
+    if (!color) {
+      return "black";
     }
-    lastColor = color;
-
     return color;
   };
 
