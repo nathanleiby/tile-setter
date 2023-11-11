@@ -1,6 +1,7 @@
 import {
   Alert,
   AspectRatio,
+  ColorInput,
   ColorSwatch,
   Flex,
   Grid,
@@ -15,8 +16,6 @@ import _ from "lodash";
 import { useState } from "react";
 import { Layer, Line, Rect, Stage } from "react-konva";
 
-// used color picker: https://imagecolorpicker.com/
-// picked from top left lighting
 const COLORS = {
   WHITE_TILE: "#f0f0f0",
   BLUE_TILE: "#3e8a94",
@@ -35,9 +34,9 @@ interface WallTileProps {
   y: number;
   flipY?: boolean;
   startColor?: string;
+  groutColor: string;
 }
 
-const GROUT_COLOR = "lightgray";
 const GROUT_WIDTH = 4;
 
 const TILE_WIDTH_UNITS = 2;
@@ -47,8 +46,6 @@ const NUMTILEHEIGHT = 10;
 
 const LOWER_CABINET_HEIGHT = 30;
 const UPPER_CABINET_HEIGHT = 5;
-
-let lastColor: string;
 
 const WallTile = (props: WallTileProps) => {
   //      (1,0)
@@ -85,7 +82,7 @@ const WallTile = (props: WallTileProps) => {
     <Line
       points={offsetLocation}
       fill={props.startColor}
-      stroke={GROUT_COLOR}
+      stroke={props.groutColor}
       strokeWidth={GROUT_WIDTH}
       closed={true}
     />
@@ -140,6 +137,7 @@ const App = () => {
   const [pYellow, setPYellow] = useState(0.2);
   const [pOrange, setPOrange] = useState(0.2);
   const [pBlue, setPBlue] = useState(0.2);
+  const [groutColor, setGroutColor] = useState("#D3D3D3");
 
   const CANVAS_VIRTUAL_WIDTH = 1200;
   const CANVAS_VIRTUAL_HEIGHT = 1000;
@@ -177,14 +175,14 @@ const App = () => {
         x:
           yIdx % 2 === 0
             ? xIdx * TILE_WIDTH_UNITS
-            : xIdx * TILE_WIDTH_UNITS + TILE_WIDTH_UNITS / 2,
+            : xIdx * TILE_WIDTH_UNITS - TILE_WIDTH_UNITS / 2,
         y: yIdx * TILE_WIDTH_UNITS,
         color: getColor(),
       });
       positions.push({
         x:
           yIdx % 2 === 0
-            ? xIdx * TILE_WIDTH_UNITS + TILE_WIDTH_UNITS / 2
+            ? xIdx * TILE_WIDTH_UNITS - TILE_WIDTH_UNITS / 2
             : xIdx * TILE_WIDTH_UNITS,
         y: yIdx * TILE_WIDTH_UNITS,
         flipY: true,
@@ -210,6 +208,7 @@ const App = () => {
                   y={p.y}
                   flipY={p.flipY}
                   startColor={p.color}
+                  groutColor={groutColor}
                 />
               ))}
               <Rect
@@ -259,53 +258,61 @@ const App = () => {
 
       <Grid.Col span={4}>
         <Stack>
-          <h3>White</h3>
-          <Flex align={"center"} gap={"sm"}>
-            <ColorSwatch color={COLORS.WHITE_TILE} /> Blanco
-          </Flex>
-          <Slider
-            value={_.round(pWhite, 2)}
-            onChange={setPWhite}
-            min={0}
-            max={1.0}
-            step={0.01}
-            label={(v) => `${_.round(v * 100, 1)}%`}
-          />
-          <h3>Colors</h3>
-          <Flex align={"center"} gap={"sm"}>
-            <ColorSwatch color={COLORS.YELLOW_TILE} /> Limone
-          </Flex>
-          <Slider
-            value={_.round(pYellow, 2)}
-            onChange={setPYellow}
-            min={0}
-            max={1.0}
-            step={0.01}
-            label={null}
-          />
-          <Flex align={"center"} gap={"sm"}>
-            <ColorSwatch color={COLORS.ORANGE_TILE} /> Hermes
-          </Flex>
-          <Slider
-            value={_.round(pOrange, 2)}
-            onChange={setPOrange}
-            min={0}
-            max={1.0}
-            step={0.01}
-            label={null}
-          />
-          <Flex align={"center"} gap={"sm"}>
-            <ColorSwatch color={COLORS.BLUE_TILE} /> Bora Bora
-          </Flex>
-          <Slider
-            value={_.round(pBlue, 2)}
-            onChange={setPBlue}
-            min={0}
-            max={1.0}
-            step={0.01}
-            label={null}
-          />
-          <Space h="xl" />
+          <div>
+            <h3>White</h3>
+            <Stack>
+              <Flex align={"center"} gap={"sm"}>
+                <ColorSwatch color={COLORS.WHITE_TILE} /> Blanco
+              </Flex>
+              <Slider
+                value={_.round(pWhite, 2)}
+                onChange={setPWhite}
+                min={0}
+                max={1.0}
+                step={0.01}
+                label={(v) => `${_.round(v * 100, 1)}%`}
+              />
+            </Stack>
+          </div>
+          <div>
+            <h3>Colors</h3>
+            <Stack>
+              <Flex align={"center"} gap={"sm"}>
+                <ColorSwatch color={COLORS.YELLOW_TILE} /> Limone
+              </Flex>
+              <Slider
+                value={_.round(pYellow, 2)}
+                onChange={setPYellow}
+                min={0}
+                max={1.0}
+                step={0.01}
+                label={null}
+              />
+              <Flex align={"center"} gap={"sm"}>
+                <ColorSwatch color={COLORS.ORANGE_TILE} /> Hermes
+              </Flex>
+              <Slider
+                value={_.round(pOrange, 2)}
+                onChange={setPOrange}
+                min={0}
+                max={1.0}
+                step={0.01}
+                label={null}
+              />
+              <Flex align={"center"} gap={"sm"}>
+                <ColorSwatch color={COLORS.BLUE_TILE} /> Bora Bora
+              </Flex>
+              <Slider
+                value={_.round(pBlue, 2)}
+                onChange={setPBlue}
+                min={0}
+                max={1.0}
+                step={0.01}
+                label={null}
+              />
+            </Stack>
+          </div>
+          <Space h="md" />
           <Alert title="Percent of Tile (overall)">
             <List>
               <List.Item>White = {_.round(pWhite * 100, 1)}%</List.Item>
@@ -335,14 +342,24 @@ const App = () => {
               </List.Item>
             </List>
           </Alert>
-          <h3>Other</h3>
-          <Flex align={"center"} gap={"sm"}>
-            <ColorSwatch color={COLORS.KITCHEN_RANGE_ARANCIO} /> Bertazonni
-            Range (Arancino)
-          </Flex>
-          <Flex align={"center"} gap={"sm"}>
-            <ColorSwatch color={COLORS.KITCHEN_LOWER_CABINET} /> Lower Cabinets
-          </Flex>
+          <div>
+            <h4>Other</h4>
+            <Stack>
+              <ColorInput
+                label={"Grout Color"}
+                value={groutColor}
+                onChange={setGroutColor}
+              />
+              <Flex align={"center"} gap={"sm"}>
+                <ColorSwatch color={COLORS.KITCHEN_RANGE_ARANCIO} /> Bertazonni
+                Range (Arancino)
+              </Flex>
+              <Flex align={"center"} gap={"sm"}>
+                <ColorSwatch color={COLORS.KITCHEN_LOWER_CABINET} /> Lower
+                Cabinets
+              </Flex>
+            </Stack>
+          </div>
         </Stack>
       </Grid.Col>
     </Grid>
@@ -350,38 +367,3 @@ const App = () => {
 };
 
 export default App;
-
-const randWeighted = (weights: number[]) => {
-  // normalize weights
-
-  const sum = _.sum(weights);
-  const normalizedWeights = weights.map((w) => w / sum);
-
-  // choose an index from the original weights array based on normalized weights
-  const r = _.random(0, 1, true);
-  let n = 0;
-  for (let i = 0; i < normalizedWeights.length; i++) {
-    n += normalizedWeights[i];
-    if (r < n) {
-      return i;
-    }
-  }
-  throw new Error("bug in randWeighted");
-};
-
-function randomTileColor(
-  WHITE_VS_NOT: number,
-  WEIGHT_YELLOW: number,
-  WEIGHT_ORANGE: number,
-  WEIGHT_BLUE: number
-) {
-  // weighted random
-  let color;
-  if (_.random(0, 1, true) < WHITE_VS_NOT) {
-    color = COLORS.WHITE_TILE;
-  } else {
-    const idx = randWeighted([WEIGHT_YELLOW, WEIGHT_ORANGE, WEIGHT_BLUE]);
-    return [COLORS.YELLOW_TILE, COLORS.ORANGE_TILE, COLORS.BLUE_TILE][idx];
-  }
-  return color;
-}
