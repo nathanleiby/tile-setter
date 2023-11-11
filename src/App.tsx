@@ -137,12 +137,18 @@ const App = () => {
   for (let xIdx = 0; xIdx < NUMTILEWIDTH; xIdx++) {
     for (let yIdx = 0; yIdx < NUMTILEHEIGHT; yIdx++) {
       positions.push({
-        x: xIdx * TILE_WIDTH_UNITS,
+        x:
+          yIdx % 2 === 0
+            ? xIdx * TILE_WIDTH_UNITS
+            : xIdx * TILE_WIDTH_UNITS + TILE_WIDTH_UNITS / 2,
         y: yIdx * TILE_WIDTH_UNITS,
         color: getColor(),
       });
       positions.push({
-        x: xIdx * TILE_WIDTH_UNITS + TILE_WIDTH_UNITS / 2,
+        x:
+          yIdx % 2 === 0
+            ? xIdx * TILE_WIDTH_UNITS + TILE_WIDTH_UNITS / 2
+            : xIdx * TILE_WIDTH_UNITS,
         y: yIdx * TILE_WIDTH_UNITS,
         flipY: true,
         color: getColor(),
@@ -216,7 +222,7 @@ const App = () => {
 
       <Grid.Col span={4}>
         <Stack>
-          <h2>White</h2>
+          <h3>White</h3>
           <Flex align={"center"} gap={"sm"}>
             <ColorSwatch color={COLORS.WHITE_TILE} /> Blanco
           </Flex>
@@ -228,7 +234,7 @@ const App = () => {
             step={0.01}
             label={(v) => `${_.round(v * 100, 1)}%`}
           />
-          <h2>Colors</h2>
+          <h3>Colors</h3>
           <Flex align={"center"} gap={"sm"}>
             <ColorSwatch color={COLORS.YELLOW_TILE} /> Limone
           </Flex>
@@ -292,7 +298,7 @@ const App = () => {
               </List.Item>
             </List>
           </Alert>
-          <h2>Other</h2>
+          <h3>Other</h3>
           <Flex align={"center"} gap={"sm"}>
             <ColorSwatch color={COLORS.KITCHEN_RANGE_ARANCIO} /> Bertazonni
             Range (Arancino)
